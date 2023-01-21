@@ -9,6 +9,7 @@ pipeline {
         stage('Build') {
             steps {
                 sh 'npm install'
+                sh 'rm -rf node_modules && npm install'
             }
         }
         stage('Test') {
@@ -17,9 +18,15 @@ pipeline {
                 sh './jenkins/scripts/test.sh'
             }
         }
+        stage('Manual Approval') {
+            steps {
+                input message: 'Lanjutkan ke tahap Deploy?'
+            }
+        }
         stage('Deploy') {
             steps {
                 sh './jenkins/scripts/deliver.sh' 
+                sleep 10
                 input message: 'Sudah selesai menggunakan React App? (Klik "Proceed" untuk mengakhiri)' 
                 sh './jenkins/scripts/kill.sh' 
             }
